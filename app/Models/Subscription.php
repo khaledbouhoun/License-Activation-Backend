@@ -19,6 +19,7 @@ class Subscription extends Model
     protected $fillable = [
         'client_id',
         'application_id',
+        'type_app',
         'license_key',
         'max_devices',
         'duration',
@@ -31,8 +32,13 @@ class Subscription extends Model
     ];
 
     protected $casts = [
+        'client_id' => 'integer',
+        'application_id' => 'integer',
+        'type_app' => 'integer',
         'is_active' => 'integer',
         'duration' => 'integer',
+        'max_devices' => 'integer',
+        'licenses_count' => 'integer',
         'start_date' => 'date',
         'expiry_date' => 'date',
     ];

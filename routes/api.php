@@ -12,6 +12,8 @@ use App\Http\Controllers\LicenseController;
 
 // Activation routes accessible by client apps & desktop
 Route::post('activate', [ActivationController::class, 'activate']);
+Route::delete('deactivate', [ActivationController::class, 'deactivate']);
+
 Route::post('check', [ActivationController::class, 'check']);
 Route::get('test', function () {
     return response()->json(['message' => 'Test passed']);

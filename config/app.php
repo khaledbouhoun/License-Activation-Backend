@@ -69,8 +69,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // config/app.php
 
+    'timezone' => 'Africa/Algiers',
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

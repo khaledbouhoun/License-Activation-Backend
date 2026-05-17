@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
 use App\Models\Subscription;
@@ -98,30 +99,25 @@ class ActivationController extends Controller
             'device_id' => 'required|string',
         ]);
 
-        // استخدام eager loading للرخص (licenses) يحسن الأداء
         $subscription = Subscription::with([
             'licenses' => function ($query) use ($validated) {
                 $query->where('device_id', $validated['device_id']);
             }
         ])->where('license_key', $validated['license_key'])->first();
 
-        // 401: الرخصة غير موجودة أصلاً
         if (!$subscription) {
             return response()->json(['error' => 'Invalid license key'], Response::HTTP_UNAUTHORIZED);
         }
 
-        // 403: استدعاء دالة من الموديل للتحقق من الصلاحية (تنظيم أفضل)
         if (!$subscription->is_active || ($subscription->expiry_date && Carbon::parse($subscription->expiry_date)->isPast())) {
             return response()->json(['error' => 'Subscription expired or inactive'], Response::HTTP_FORBIDDEN);
         }
 
-        // التحقق مما إذا كان هذا الجهاز بالتحديد مسجلاً لهذه الرخصة
         $license = $subscription->licenses->first();
         if (!$license) {
             return response()->json(['error' => 'Device not registered for this license'], Response::HTTP_FORBIDDEN);
         }
 
-        // تحديث تاريخ آخر مزامنة (Last Sync) بصمت دون تغيير الـ Timestamps إذا أردت
         $license->update(['last_sync_date' => now()]);
 
         return response()->json([
@@ -130,5 +126,29 @@ class ActivationController extends Controller
             'subscription' => $subscription,
             'license' => $license,
         ], Response::HTTP_OK);
+    }
+    
+     public function deactivate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'subscription_id' => 'required|exists:subscriptions,id',
+            'device_id' => 'required|exists:licenses,device_id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $license = License::where('subscription_id', $request->subscription_id)
+            ->where('device_id', $request->device_id)
+            ->first();
+
+        if (!$license) {
+            return response()->json(['message' => 'License not found'], 404);
+        }
+
+        $license->delete();
+
+        return response()->json(['message' => 'License deactivated successfully']);
     }
 }

@@ -25,6 +25,7 @@ class License extends Model
     ];
 
     protected $casts = [
+        'subscription_id' => 'integer',
         'last_sync_date' => 'datetime',
         'start_date' => 'date',
         'expiry_date' => 'date',
