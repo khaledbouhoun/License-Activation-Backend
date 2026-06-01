@@ -26,9 +26,9 @@ class Subscription extends Model
         'start_date',
         'expiry_date',
         'is_active',
+        'note',
         'created_at',
         'updated_at',
-
     ];
 
     protected $casts = [

@@ -32,6 +32,7 @@ class SubscriptionController extends Controller
             'duration' => 'required|integer|min:1',
             'start_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after:start_date',
+            'note' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
 
@@ -87,6 +88,7 @@ class SubscriptionController extends Controller
             'duration' => 'sometimes|required|integer|min:1',
             'start_date' => 'sometimes|nullable|date',
             'expiry_date' => 'sometimes|nullable|date|after:start_date',
+            'note' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
 
